@@ -18,7 +18,8 @@ func main() {
 	fmt.Println("Choose a website to fetch information from:")
 	fmt.Println("1: The Hacker News")
 	fmt.Println("2: Security Week")
-	fmt.Print("Enter choice (1 or 2): ")
+	fmt.Println("3: Snyk Recent Vulnerabilities")
+	fmt.Print("Enter choice (1, 2, or 3): ")
 
 	choice, _ := reader.ReadString('\n')
 	choice = strings.TrimSpace(choice)
@@ -29,6 +30,8 @@ func main() {
 		url = "https://thehackernews.com/"
 	case "2":
 		url = "https://www.securityweek.com/"
+	case "3":
+		url = "https://security.snyk.io/"
 	default:
 		fmt.Println("Invalid choice")
 		return
@@ -68,6 +71,14 @@ func main() {
 				} else if t.Data == "p" && hasClass(t.Attr, "zox-s-graph") {
 					inDescription = true
 				}
+			} else if choice == "3" {
+				if t.Data == "a" && hasClass(t.Attr, "vue--anchor") {
+					inTitle = true
+				} else if t.Data == "div" && hasClass(t.Attr, "vue--severity__text") {
+					inDescription = true
+				} else if t.Data == "span" && hasClass(t.Attr, "vue--severity__label") {
+					inDateTime = true
+				}
 			}
 		case tt == html.TextToken:
 			text := string(z.Text())
@@ -80,12 +91,7 @@ func main() {
 			case "3":
 				filterDateTime(text)
 			case "4":
-				filterTitles(text)
-				filterDescriptions(text)
-				filterDateTime(text)
-			default:
-				fmt.Println("Invalid choice")
-				return
+				filterAll(text)
 			}
 		}
 	}
@@ -135,4 +141,10 @@ func filterDateTime(text string) {
 		color.Yellow(text) // Tarih ve saat bilgisini sarı renkte göster
 		inDateTime = false
 	}
+}
+
+func filterAll(text string) {
+	filterTitles(text)
+	filterDescriptions(text)
+	filterDateTime(text)
 }
